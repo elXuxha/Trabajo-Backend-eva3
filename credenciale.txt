@@ -1,0 +1,10 @@
+Rol	Usuario	Contraseña	Acceso
+Administrador	admin	admin123	Panel Admin + Tienda
+Cliente	cliente1	cliente123	Tienda, Carrito, Pedidos, Perfil
+Colaborador Bodega	bodega1	bodega123	Tienda + API Bodega
+
+URLs:
+
+Tienda: http://127.0.0.1:8000/
+Admin: http://127.0.0.1:8000/admin/
+Login: http://127.0.0.1:8000/cuenta/login/

@@ -1,0 +1,97 @@
+================================================================================
+MUSIC PRO TOUR 2026 - HOJA DE RUTAS Y ACCESOS (EVALUACIÓN 3)
+Servidor local base: http://127.0.0.1:8000
+================================================================================
+
+1. CREDENCIALES DE ACCESO
+--------------------------------------------------------------------------------
+* Administrador (acceso total a panel propio, CRUD y reportes):
+  - Usuario:     admin
+  - Contraseña:  admin123
+
+* Encargado de Bodega:
+  - Usuario:     bodega1
+  - Contraseña:  bodega123
+
+* Cliente de prueba:
+  - Usuario:     cliente1
+  - Contraseña:  cliente123
+
+
+2. SISTEMA DE AUTENTICACIÓN PROPIO
+--------------------------------------------------------------------------------
+- Iniciar Sesión (Login):
+  http://127.0.0.1:8000/cuenta/login/
+
+- Cerrar Sesión (Logout):
+  http://127.0.0.1:8000/cuenta/logout/
+
+- Registro de Clientes:
+  http://127.0.0.1:8000/cuenta/registro/
+
+- Perfil del Usuario:
+  http://127.0.0.1:8000/cuenta/perfil/
+
+
+3. PANEL ADMINISTRATIVO PROPIO (CRUD SIN DJANGO ADMIN)
+--------------------------------------------------------------------------------
+- Dashboard Administrativo:
+  http://127.0.0.1:8000/panel/
+
+- Gestión de Usuarios (Listado):
+  http://127.0.0.1:8000/panel/usuarios/
+
+- Crear Nuevo Usuario:
+  http://127.0.0.1:8000/panel/usuarios/nuevo/
+
+- Editar Usuario (requiere ID):
+  http://127.0.0.1:8000/panel/usuarios/<id>/editar/
+
+- Gestión de Productos (Listado):
+  http://127.0.0.1:8000/panel/productos/
+
+- Crear Nuevo Producto:
+  http://127.0.0.1:8000/panel/productos/nuevo/
+
+- Editar Producto (requiere ID):
+  http://127.0.0.1:8000/panel/productos/<id>/editar/
+
+- Gestión de Pedidos / Ventas:
+  http://127.0.0.1:8000/panel/pedidos/
+
+
+4. MÓDULO DE REPORTES Y ANALÍTICA (20 CONSULTAS ORM)
+--------------------------------------------------------------------------------
+- Dashboard de Reportes de Tienda:
+  http://127.0.0.1:8000/reportes/
+
+
+5. MÓDULO DE BODEGA Y DESPACHOS
+--------------------------------------------------------------------------------
+- Dashboard de Bodega:
+  http://127.0.0.1:8000/bodega/
+
+- Inventario y Stock de Bodega:
+  http://127.0.0.1:8000/bodega/stock/
+
+- Despachos y Pedidos de Bodega:
+  http://127.0.0.1:8000/bodega/pedidos/
+
+
+6. TIENDA PÚBLICA (VITRINA / CLIENTE)
+--------------------------------------------------------------------------------
+- Portada / Catálogo Principal:
+  http://127.0.0.1:8000/
+
+- Carrito de Compras:
+  http://127.0.0.1:8000/carrito/
+
+- Historial de Pedidos del Cliente:
+  http://127.0.0.1:8000/pedidos/
+
+
+7. ACCESO LEGACY DJANGO ADMIN
+--------------------------------------------------------------------------------
+- Panel Django Admin (por defecto):
+  http://127.0.0.1:8000/admin/
+================================================================================

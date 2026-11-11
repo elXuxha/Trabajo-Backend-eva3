@@ -1,0 +1,518 @@
+[
+  {
+    "model": "catalog.branch",
+    "pk": 1,
+    "fields": {
+      "name": "Music Pro Sucursal del Rock",
+      "branch_type": "rock",
+      "address": "Av. Providencia 1234",
+      "city": "Santiago",
+      "phone": "+56 9 1234 5678",
+      "email": "rock@musicpro.cl",
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.branch",
+    "pk": 2,
+    "fields": {
+      "name": "Music Pro Sucursal DJ",
+      "branch_type": "dj",
+      "address": "Av. Apoquindo 5678",
+      "city": "Santiago",
+      "phone": "+56 9 8765 4321",
+      "email": "dj@musicpro.cl",
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.branch",
+    "pk": 3,
+    "fields": {
+      "name": "Music Pro Sucursal Reggaetón y Cumbia",
+      "branch_type": "reggaeton",
+      "address": "Av. Vicuña Mackenna 901",
+      "city": "Santiago",
+      "phone": "+56 9 1122 3344",
+      "email": "reggaeton@musicpro.cl",
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 1,
+    "fields": {
+      "name": "Guitarras",
+      "slug": "guitarras",
+      "description": "Guitarras acústicas, eléctricas y bajos de las mejores marcas",
+      "parent": null,
+      "is_active": true,
+      "sort_order": 1,
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 2,
+    "fields": {
+      "name": "Guitarras Eléctricas",
+      "slug": "guitarras-electricas",
+      "description": "Guitarras eléctricas para todo tipo de género",
+      "parent": 1,
+      "is_active": true,
+      "sort_order": 1,
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 3,
+    "fields": {
+      "name": "Guitarras Acústicas",
+      "slug": "guitarras-acusticas",
+      "description": "Guitarras acústicas naturales",
+      "parent": 1,
+      "is_active": true,
+      "sort_order": 2,
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 4,
+    "fields": {
+      "name": "Teclados y Pianos",
+      "slug": "teclados-pianos",
+      "description": "Pianos digitales, teclados y sintetizadores",
+      "parent": null,
+      "is_active": true,
+      "sort_order": 2,
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 5,
+    "fields": {
+      "name": "Baterías y Percusión",
+      "slug": "baterias-percusion",
+      "description": "Baterías acústicas, electrónicas y percusión",
+      "parent": null,
+      "is_active": true,
+      "sort_order": 3,
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 6,
+    "fields": {
+      "name": "Audio Profesional",
+      "slug": "audio-profesional",
+      "description": "Equipos de sonido profesional, mezcladoras, amplificadores",
+      "parent": null,
+      "is_active": true,
+      "sort_order": 4,
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 7,
+    "fields": {
+      "name": "Equipos DJ",
+      "slug": "equipos-dj",
+      "description": "Controladores, mezcladoras, tornamesas y accesorios DJ",
+      "parent": null,
+      "is_active": true,
+      "sort_order": 5,
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 8,
+    "fields": {
+      "name": "Accesorios",
+      "slug": "accesorios",
+      "description": "Cuerdas, púas, fundas, cables y más",
+      "parent": null,
+      "is_active": true,
+      "sort_order": 6,
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.brand",
+    "pk": 1,
+    "fields": {
+      "name": "Fender",
+      "slug": "fender",
+      "description": "Guitarras y amplificadores legendarios",
+      "is_active": true
+    }
+  },
+  {
+    "model": "catalog.brand",
+    "pk": 2,
+    "fields": {
+      "name": "Gibson",
+      "slug": "gibson",
+      "description": "Guitarras eléctricas premium",
+      "is_active": true
+    }
+  },
+  {
+    "model": "catalog.brand",
+    "pk": 3,
+    "fields": {
+      "name": "Yamaha",
+      "slug": "yamaha",
+      "description": "Instrumentos musicales de toda categoría",
+      "is_active": true
+    }
+  },
+  {
+    "model": "catalog.brand",
+    "pk": 4,
+    "fields": {
+      "name": "Roland",
+      "slug": "roland",
+      "description": "Baterías electrónicas y teclados",
+      "is_active": true
+    }
+  },
+  {
+    "model": "catalog.brand",
+    "pk": 5,
+    "fields": {
+      "name": "Pioneer DJ",
+      "slug": "pioneer-dj",
+      "description": "Equipamiento profesional para DJs",
+      "is_active": true
+    }
+  },
+  {
+    "model": "catalog.brand",
+    "pk": 6,
+    "fields": {
+      "name": "Shure",
+      "slug": "shure",
+      "description": "Micrófonos y audio profesional",
+      "is_active": true
+    }
+  },
+  {
+    "model": "catalog.brand",
+    "pk": 7,
+    "fields": {
+      "name": "Music Pro",
+      "slug": "music-pro",
+      "description": "Marca propia Music Pro",
+      "is_active": true
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 1,
+    "fields": {
+      "name": "Fender Stratocaster Player",
+      "slug": "fender-stratocaster-player",
+      "sku": "FEN-STR-001",
+      "description": "La Fender Stratocaster Player es la guitarra eléctrica por excelencia. Con pickups Alnico 5 y un cuerpo de aliso, ofrece un sonido versátil que va del blues al rock más pesado. El mástil de arce con diapasón de palisandro proporciona una comodidad excepcional al tocar.",
+      "short_description": "Guitarra eléctrica Fender Stratocaster con pickups Alnico 5",
+      "price": 649990,
+      "original_price": 749990,
+      "category": 2,
+      "brand": 1,
+      "stock": 15,
+      "min_stock": 3,
+      "weight": 4.5,
+      "is_active": true,
+      "is_featured": true,
+      "is_new": false,
+      "is_on_sale": true,
+      "views_count": 234,
+      "created_at": "2026-01-15T00:00:00Z",
+      "updated_at": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 2,
+    "fields": {
+      "name": "Gibson Les Paul Standard 50s",
+      "slug": "gibson-les-paul-standard-50s",
+      "sku": "GIB-LP-002",
+      "description": "La Gibson Les Paul Standard 50s captura la esencia de las Les Paul más icónicas. Con pastillas Burstbucker y un cuerpo de caoba, ofrece un tono cálido y potente. El mástil en forma de D vintage proporciona una sensibilidad retro inigualable.",
+      "short_description": "Guitarra eléctrica Gibson Les Paul con pastillas Burstbucker",
+      "price": 1299990,
+      "original_price": null,
+      "category": 2,
+      "brand": 2,
+      "stock": 8,
+      "min_stock": 2,
+      "weight": 4.8,
+      "is_active": true,
+      "is_featured": true,
+      "is_new": false,
+      "is_on_sale": false,
+      "views_count": 189,
+      "created_at": "2026-01-15T00:00:00Z",
+      "updated_at": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 3,
+    "fields": {
+      "name": "Yamaha FG800 Acústica",
+      "slug": "yamaha-fg800-acustica",
+      "sku": "YAM-FG-003",
+      "description": "La Yamaha FG800 es la guitarra acústica ideal para principiantes y profesionales. Con tapa de abeto sólido y fondo/laterales de nato, ofrece un sonido equilibrado y proyectado. Su construcción de calidad Yamaha garantiza durabilidad.",
+      "short_description": "Guitarra acústica Yamaha con tapa de abeto sólido",
+      "price": 199990,
+      "original_price": 249990,
+      "category": 3,
+      "brand": 3,
+      "stock": 25,
+      "min_stock": 5,
+      "weight": 2.3,
+      "is_active": true,
+      "is_featured": true,
+      "is_new": false,
+      "is_on_sale": true,
+      "views_count": 312,
+      "created_at": "2026-01-15T00:00:00Z",
+      "updated_at": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 4,
+    "fields": {
+      "name": "Roland TD-17KVX Batería Electrónica",
+      "slug": "roland-td-17kvx-bateria",
+      "sku": "ROL-TD-004",
+      "description": "La Roland TD-17KVX es una batería electrónica de nivel profesional. Con pads de malla en los tambores y platillos de sensor de cosquilleo, ofrece una sensación de respuesta natural. El módulo TD-17 incluye más de 300 sonidos.",
+      "short_description": "Batería electrónica Roland con pads de malla y módulo TD-17",
+      "price": 1499990,
+      "original_price": null,
+      "category": 5,
+      "brand": 4,
+      "stock": 5,
+      "min_stock": 2,
+      "weight": 25.0,
+      "is_active": true,
+      "is_featured": true,
+      "is_new": true,
+      "is_on_sale": false,
+      "views_count": 156,
+      "created_at": "2026-03-01T00:00:00Z",
+      "updated_at": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 5,
+    "fields": {
+      "name": "Pioneer DDJ-1000 Controlador DJ",
+      "slug": "pioneer-ddj-1000",
+      "sku": "PIONEER-DDJ-005",
+      "description": "El Pioneer DDJ-1000 es el controlador DJ profesional definitivo para Rekordbox. Con faders de alta calidad, pads RGB y dos pantallas fullscreen integradas, ofrece una experiencia de mezcla fluida y profesional.",
+      "short_description": "Controlador DJ Pioneer para Rekordbox con pantallas integradas",
+      "price": 899990,
+      "original_price": 999990,
+      "category": 7,
+      "brand": 5,
+      "stock": 10,
+      "min_stock": 3,
+      "weight": 6.5,
+      "is_active": true,
+      "is_featured": true,
+      "is_new": false,
+      "is_on_sale": true,
+      "views_count": 278,
+      "created_at": "2026-01-15T00:00:00Z",
+      "updated_at": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 6,
+    "fields": {
+      "name": "Shure SM58 Micrófono Vocal",
+      "slug": "shure-sm58-microfono",
+      "sku": "SHU-SM58-006",
+      "description": "El Shure SM58 es el micrófono vocal dinámico más vendido del mundo. Con patrón polar cardioide y respuesta de frecuencia optimizada para la voz, es el estándar de la industria para actuaciones en vivo.",
+      "short_description": "Micrófono vocal dinámico cardioide Shure SM58",
+      "price": 99990,
+      "original_price": null,
+      "category": 6,
+      "brand": 6,
+      "stock": 50,
+      "min_stock": 10,
+      "weight": 0.3,
+      "is_active": true,
+      "is_featured": false,
+      "is_new": false,
+      "is_on_sale": false,
+      "views_count": 445,
+      "created_at": "2026-01-15T00:00:00Z",
+      "updated_at": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 7,
+    "fields": {
+      "name": "Yamaha P-45 Piano Digital",
+      "slug": "yamaha-p-45-piano-digital",
+      "sku": "YAM-P45-007",
+      "description": "El Yamaha P-45 es un piano digital de 88 teclas con acción de martillo GHS. Con 10 sonidos de alta calidad y funcionalidad de dual mode, es perfecto para estudiantes y músicos que buscan un piano portátil.",
+      "short_description": "Piano digital Yamaha de 88 teclas con acción GHS",
+      "price": 449990,
+      "original_price": 499990,
+      "category": 4,
+      "brand": 3,
+      "stock": 12,
+      "min_stock": 3,
+      "weight": 11.5,
+      "is_active": true,
+      "is_featured": false,
+      "is_new": true,
+      "is_on_sale": true,
+      "views_count": 198,
+      "created_at": "2026-04-01T00:00:00Z",
+      "updated_at": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 8,
+    "fields": {
+      "name": "Music Pro Pack Cuerdas Guitarra (3 pack)",
+      "slug": "music-pro-pack-cuerdas",
+      "sku": "MP-ACC-008",
+      "description": "Pack de 3 juegos de cuerdas para guitarra acústica Music Pro. Calidad profesional a precio accesible. Incluye tamaños 010, 011 y 012. Cuerdas de bronce fosforado para un sonido brillante y duradero.",
+      "short_description": "Pack de 3 juegos de cuerdas para guitarra acústica",
+      "price": 14990,
+      "original_price": 19990,
+      "category": 8,
+      "brand": 7,
+      "stock": 100,
+      "min_stock": 20,
+      "weight": 0.1,
+      "is_active": true,
+      "is_featured": false,
+      "is_new": false,
+      "is_on_sale": true,
+      "views_count": 567,
+      "created_at": "2026-01-15T00:00:00Z",
+      "updated_at": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 9,
+    "fields": {
+      "name": "Fender American Professional II Telecaster",
+      "slug": "fender-telecaster-professional-ii",
+      "sku": "FEN-TEL-009",
+      "description": "La Fender American Professional II Telecaster combina la tradición con innovación moderna. Con pastillas V-Mod II y un cuerpo de aliso, ofrece un tono bright y cortante que es icónico del sonido Telecaster.",
+      "short_description": "Guitarra eléctrica Fender Telecaster American Pro II",
+      "price": 1199990,
+      "original_price": null,
+      "category": 2,
+      "brand": 1,
+      "stock": 6,
+      "min_stock": 2,
+      "weight": 3.7,
+      "is_active": true,
+      "is_featured": false,
+      "is_new": true,
+      "is_on_sale": false,
+      "views_count": 134,
+      "created_at": "2026-05-01T00:00:00Z",
+      "updated_at": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 10,
+    "fields": {
+      "name": "Pioneer DJM-900NXS2 Mezcladora",
+      "slug": "pioneer-djm-900nxs2",
+      "sku": "PIONEER-DJM-010",
+      "description": "La Pioneer DJM-900NXS2 es la mezcladora de referencia en clubs y festivales de todo el mundo. Con 6 canales, efectos de alta calidad y connectividad Pro DJ Link, define el estándar del sonido profesional.",
+      "short_description": "Mezcladora DJ Pioneer de 6 canales para clubs",
+      "price": 3499990,
+      "original_price": null,
+      "category": 7,
+      "brand": 5,
+      "stock": 3,
+      "min_stock": 1,
+      "weight": 8.7,
+      "is_active": true,
+      "is_featured": true,
+      "is_new": true,
+      "is_on_sale": false,
+      "views_count": 89,
+      "created_at": "2026-06-01T00:00:00Z",
+      "updated_at": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 11,
+    "fields": {
+      "name": "Bateria Acústica Yamaha Rydeen 5 Piezas",
+      "slug": "yamaha-rydeen-5-piezas",
+      "sku": "YAM-RYD-011",
+      "description": "La Yamaha Rydeen es una batería acústica completa de 5 piezas. Con cascos de nogal de 7 capas, ofrece un sonido potente y resonante. Incluye redoblante, platillos y herrajes. Ideal para bateristas en crecimiento.",
+      "short_description": "Batería acústica Yamaha Rydeen de 5 piezas con platillos",
+      "price": 599990,
+      "original_price": 699990,
+      "category": 5,
+      "brand": 3,
+      "stock": 7,
+      "min_stock": 2,
+      "weight": 35.0,
+      "is_active": true,
+      "is_featured": false,
+      "is_new": false,
+      "is_on_sale": true,
+      "views_count": 145,
+      "created_at": "2026-01-15T00:00:00Z",
+      "updated_at": "2026-09-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 12,
+    "fields": {
+      "name": "Music Pro Púas variadas (Pack 24 und)",
+      "slug": "music-pro-puas-pack",
+      "sku": "MP-ACC-012",
+      "description": "Pack de 24 púas Music Pro en diferentes grosores: fino (0.46mm), medio (0.60mm) y grueso (0.88mm). Fabricadas en nilón de alta durabilidad. Colores variados. Ideales para guitarra acústica y eléctrica.",
+      "short_description": "Pack de 24 púas Music Pro variadas",
+      "price": 7990,
+      "original_price": 9990,
+      "category": 8,
+      "brand": 7,
+      "stock": 150,
+      "min_stock": 30,
+      "weight": 0.05,
+      "is_active": true,
+      "is_featured": false,
+      "is_new": false,
+      "is_on_sale": true,
+      "views_count": 623,
+      "created_at": "2026-01-15T00:00:00Z",
+      "updated_at": "2026-09-01T00:00:00Z"
+    }
+  }
+]

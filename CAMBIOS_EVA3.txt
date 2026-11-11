@@ -1,0 +1,236 @@
+================================================================================
+CAMBIOS REALIZADOS - EVALUACION 3 (v2) vs. PROYECTO ANTERIOR (v1)
+Proyecto: C:\Users\diego\Downloads\Trabajo Backend\musicpro
+Fecha: 09-11-2026
+Base: enunciado "Evaluacion 3 - Caso Semestral Music Pro" (Parte 1, Parte 2 y
+      informe de 20 consultas ORM del caso "TIENDA: Gestion Comercial").
+================================================================================
+
+--------------------------------------------------------------------------------
+1) SEGURIDAD Y AUTENTICACION (Parte 1: decoradores y sesion)
+--------------------------------------------------------------------------------
+[MODIFICADO] admin_panel/views.py
+  - Se elimino el decorador casero "admin_required" como unica proteccion.
+  - Nuevo decorador staff_required() con functools.wraps (control de rol).
+  - TODAS las vistas llevan ahora @login_required (primero) + @staff_required:
+      admin_dashboard, admin_users, admin_user_create, admin_user_edit,
+      admin_user_toggle, admin_products, admin_product_create,
+      admin_product_edit, admin_product_toggle, admin_orders, admin_order_detail.
+  - admin_user_toggle y admin_product_toggle ahora exigen POST (@require_POST).
+
+[MODIFICADO] warehouse/views.py
+  - Nuevo decorador warehouse_required() con functools.wraps (control de rol).
+  - Las 5 vistas llevan ahora @login_required + @warehouse_required:
+      warehouse_dashboard, warehouse_stock_list, warehouse_stock_edit,
+      warehouse_orders, warehouse_order_detail.
+
+[SIN CAMBIOS] accounts/views.py
+  - Login/Logout propio con django.contrib.auth (login, logout,
+    AuthenticationForm) y proteccion contra open redirect (?next=).
+
+RESULTADO VERIFICADO (23/23 pruebas automatizadas OK):
+  - Usuario no autenticado: /reportes/, /panel/, /panel/usuarios/,
+    /panel/productos/, /panel/usuarios/nuevo/, /panel/productos/nuevo/,
+    /bodega/  ->  302 a /cuenta/login/?next=...  (no entra por URL directa).
+  - Con sesion iniciada: todas las vistas responden 200.
+  - Tras /cuenta/logout/: /reportes/ vuelve a responder 302 (pierde acceso).
+
+--------------------------------------------------------------------------------
+2) CRUD PROPIO SIN DJANGO ADMIN (Parte 1)
+--------------------------------------------------------------------------------
+[NUEVO] admin_panel/forms.py
+  - AdminUserForm: ModelForm de accounts.User con password opcional (solo se
+    hashea con set_password si se entrega), validacion de password obligatoria
+    al crear, y creacion automatica de CustomerProfile.
+  - AdminProductForm: ModelForm de catalog.Product con validacion de precio y
+    generacion de slug unico (sin chocar con unique=True).
+
+[NUEVO] admin_panel/urls.py (rutas agregadas)
+  - usuarios/nuevo/                  -> admin_panel:user_create
+  - usuarios/<id>/editar/            -> admin_panel:user_edit
+  - productos/nuevo/                 -> admin_panel:product_create
+  - productos/<id>/editar/           -> admin_panel:product_edit
+  - productos/<id>/toggle/           -> admin_panel:product_toggle
+
+[NUEVO] admin_panel/views.py (vistas CRUD)
+  - admin_user_create / admin_user_edit   -> Crear y modificar usuarios.
+  - admin_product_create / admin_product_edit -> Crear y modificar productos.
+  - admin_product_toggle -> desactivar/activar producto (baja logica).
+  - Se mantienen: listado (admin_users, admin_products) y toggle de usuario.
+
+[NUEVO] templates/admin_panel/user_form.html
+[NUEVO] templates/admin_panel/product_form.html
+  - Formularios propios con validaciones inline, extendiendo base/base.html.
+
+[MODIFICADO] templates/admin_panel/users.html
+  - Boton "+ Nuevo usuario" y columna Acciones con "Editar" + "Desactivar".
+
+[MODIFICADO] templates/admin_panel/products.html
+  - Boton "+ Nuevo producto", columna nueva "Acciones" con "Editar" y
+    "Desactivar/Activar" (colspan del estado vacio: 8 -> 9).
+
+COBERTURA CRUD:
+  Operacion      Usuarios                Productos
+  -----------    --------------------    --------------------
+  Crear          admin_user_create       admin_product_create
+  Leer           admin_users (lista)     admin_products (lista)
+  Modificar      admin_user_edit         admin_product_edit
+  Eliminar/      admin_user_toggle       admin_product_toggle
+  Desactivar     (is_active=False)       (is_active=False)
+
+  OBSERVACION: /admin/ de Django queda montado en musicpro/urls.py pero la
+  gestion diaria de Usuarios y Productos ya NO depende de el (todo se hace en
+  /panel/ con plantillas propias).
+
+--------------------------------------------------------------------------------
+3) CONSULTAS ORM - PANEL DE REPORTES (Parte 2)
+--------------------------------------------------------------------------------
+[NUEVO] app reportes/
+  - reportes/__init__.py
+  - reportes/apps.py      (ReportesConfig)
+  - reportes/urls.py      (app_name='reportes', ruta '' -> name='tienda')
+  - reportes/views.py     (vista reportes_tienda)
+
+[MODIFICADO] musicpro/settings.py   -> 'reportes' agregado a INSTALLED_APPS.
+[MODIFICADO] musicpro/urls.py       -> path('reportes/', include('reportes.urls'))
+
+MAPPEO DE ENTIDADES DEL CASO:
+  Categoria    -> catalog.Category
+  Producto     -> catalog.Product
+  Cliente      -> accounts.User (user_type='customer')
+  Venta        -> orders.Order
+  DetalleVenta -> orders.OrderItem
+
+LAS 20 CONSULTAS EXACTAS DEL INFORME (implementadas en reportes/views.py):
+   1. Todos los productos disponibles            -> filter(is_active=True)
+   2. Productos de una categoria seleccionada    -> filter(category_id=...)
+   3. Productos dentro de un rango de precios    -> filter(price__gte/lte)
+   4. 10 productos mas caros                     -> order_by('-price')[:10]
+   5. Total de clientes registrados              -> filter(user_type=...).count()
+   6. Compras de un cliente especifico           -> Order.filter(user_id=...)
+   7. Productos de una venta determinada         -> OrderItem.filter(order_id=...)
+   8. Ventas en un periodo seleccionado          -> filter(created_at__date__gte/lte)
+   9. Productos con menos de 5 unidades          -> filter(stock__lt=5)
+  10. Monto total vendido en un dia              -> filter(created_at__date).aggregate(Sum)
+  11. 5 productos mas vendidos (unidades)        -> values().annotate(Sum('quantity'))[:5]
+  12. 5 clientes con mas compras                 -> annotate(Count('orders'))[:5]
+  13. Monto total comprado por cada cliente      -> annotate(Sum('orders__total'))
+  14. Productos nunca vendidos                   -> filter(orderitem__isnull=True)
+  15. Promedio gastado por venta                 -> exclude('cancelled').aggregate(Avg)
+  16. Categoria con mayor monto de ventas        -> values().annotate(Sum(F*F))[:1]
+  17. Unidades vendidas por producto ultimo mes  -> filter(order__created_at__date...) + TruncMonth-free Sum
+  18. Cliente que mas gasto en el ano            -> filter(orders__created_at__year).annotate(Sum)
+  19. Distribucion de montos por mes del ano     -> annotate(TruncMonth).values().annotate(Sum, Count)
+  20. 10 productos con mayores ingresos          -> values().annotate(Sum(F('quantity')*F('product_price')))[:10]
+
+TODAS usan EXCLUSIVAMENTE el ORM: filter, values, select_related, count,
+annotate, aggregate, Sum, Count, Avg, F, Q y TruncMonth.
+NO se usa SQL crudo: cero .raw(), .extra(), cursor() o connection.execute().
+(Unico acceso a bajo nivel en el proyecto: los PRAGMAs SQLite del comando de
+inyeccion, que el enunciado exige expresamente.)
+
+--------------------------------------------------------------------------------
+4) FRONTEND DE REPORTES (templates/reportes_tienda.html)
+--------------------------------------------------------------------------------
+[NUEVO] templates/reportes_tienda.html
+  - Diseno 100% original (no copia el dashboard de referencia del documento):
+    paleta propia indigo #3B5BDB / esmeralda #12B886 / ambar #F59F00 sobre
+    fondo #F5F7FB, hero con degradado, tarjetas numeradas por consulta,
+    secciones por nivel (Basico, Intermedio, Avanzado, Analisis).
+  - Bootstrap 5.3.3 via CDN + CSS propio embebido (sin Tailwind en esta pagina
+    para evitar conflictos de estilos).
+  - Barra de filtros GET para las consultas con seleccion:
+    categoria, precio min/max, cliente, venta, dia, periodo (desde/hasta), anio.
+  - Tablas con estados vacios y formato de montos con humanize|intcomma.
+  - Cabecera propia con links al panel, productos, usuarios y cerrar sesion.
+
+[MODIFICADO] templates/base/base.html
+  - Enlace "Reportes Tienda" en el menu desplegable del usuario administrador.
+
+[MODIFICADO] templates/admin_panel/dashboard.html
+  - Tarjeta de acciones rapidas "Reportes" (grid md:grid-cols-4 -> md:grid-cols-5).
+
+--------------------------------------------------------------------------------
+5) COMANDO DE INYECCION MASIVA (inyectar_stress)
+--------------------------------------------------------------------------------
+[NUEVO] catalog/management/__init__.py
+[NUEVO] catalog/management/commands/__init__.py
+[NUEVO] catalog/management/commands/inyectar_stress.py
+
+  Estructura exacta exigida: catalog/management/commands/inyectar_stress.py
+  Uso:  python manage.py inyectar_stress
+        python manage.py inyectar_stress --usuarios 5000 --productos 2000 --pedidos 20000
+
+  Cumplimientos de la rubrica:
+  [x] PRAGMAs de SQLite ANTES de inyectar:
+        PRAGMA synchronous = OFF;
+        PRAGMA journal_mode = MEMORY;
+  [x] bulk_create(..., batch_size=1000) envuelto en transaction.atomic().
+  [x] make_password('stress123') calculado UNA sola vez, FUERA de los bucles
+      (el hash se asigna tal cual a cada usuario).
+  [x] Faker llamado solo UNA vez para construir pools (nombres, apellidos,
+      calles, ciudades, telefonos, frases, precios, stock...); dentro de los
+      bucles SOLO random.choice() / random.choices().
+  [x] Sin faker.py ni generate_fake_data.py sueltos:
+      - ELIMINADO: generate_fake_data.py (raiz del proyecto).
+      - No existia ningun archivo faker.py.
+  Extras:
+  [x] Idempotente (ignore_conflicts=True): se puede ejecutar mas de una vez.
+  [x] Reparte created_at de usuarios y pedidos en los ultimos 365 dias con
+      ORM (.update()), para que las consultas 17, 18 y 19 tengan datos.
+  [x] Respeta el limite de parametros de SQLite (bloques de 500 en los IN).
+
+--------------------------------------------------------------------------------
+6) VERIFICACION REALIZADA
+--------------------------------------------------------------------------------
+  - "python manage.py check" -> sin errores (solo aviso preexistente
+    tailwind.W002 de theme en INSTALLED_APPS).
+  - 23/23 pruebas automatizadas OK sobre la base original:
+      * 7 redirecciones de anonimo (302 a login)
+      * 6 paginas con sesion (200)
+      * 20 consultas del informe presentes en reportes_tienda.html
+      * Bootstrap 5 en la plantilla
+      * Crear / editar / desactivar usuario  (persiste en BD)
+      * Crear / editar / desactivar producto (persiste en BD)
+      * Logout -> acceso denegado (302)
+  - Se ejecuto inyectar_stress con datos de prueba y luego se RESTAURO la base
+    original db.sqlite3 (sin datos de prueba residuales).
+
+--------------------------------------------------------------------------------
+7) DECISION Y OBSERVACION ABIERTA
+--------------------------------------------------------------------------------
+  - Conexion con MySQL: el enunciado (Parte 1) pide "Conexion con MySQL: el
+    programa debera estar conectado de forma local con MySQL". El proyecto
+    funciona con SQLite (musicpro/settings.py -> DATABASES sqlite3) y en esta
+    PC no hay servidor MySQL ni driver instalado. Se decidio mantener SQLite
+    por indicacion del estudiante. Si el evaluador exige MySQL, hay que:
+      pip install mysqlclient
+      crear BD "musicpro" y usuario, y reemplazar DATABASES por el backend
+      'django.db.backends.mysql' con NAME/USER/PASSWORD/HOST/PORT=3306.
+
+================================================================================
+ARCHIVOS CREADOS (10):
+  admin_panel/forms.py
+  templates/admin_panel/user_form.html
+  templates/admin_panel/product_form.html
+  reportes/__init__.py, reportes/apps.py, reportes/urls.py, reportes/views.py
+  catalog/management/__init__.py
+  catalog/management/commands/__init__.py
+  catalog/management/commands/inyectar_stress.py
+  templates/reportes_tienda.html
+  CAMBIOS_EVA3.txt (este archivo)
+
+ARCHIVOS MODIFICADOS (7):
+  admin_panel/views.py
+  admin_panel/urls.py
+  warehouse/views.py
+  musicpro/settings.py
+  musicpro/urls.py
+  templates/base/base.html
+  templates/admin_panel/dashboard.html
+  templates/admin_panel/users.html
+  templates/admin_panel/products.html
+
+ARCHIVOS ELIMINADOS (1):
+  generate_fake_data.py
+================================================================================
