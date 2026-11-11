@@ -1,0 +1,65 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ accion }} Usuario{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <nav class="text-sm mb-4">
+        <ol class="flex items-center space-x-2 text-gray-500">
+            <li><a href="{% url 'admin_panel:dashboard' %}" class="hover:text-mp-red">Admin</a></li>
+            <li>/</li>
+            <li><a href="{% url 'admin_panel:users' %}" class="hover:text-mp-red">Usuarios</a></li>
+            <li>/</li>
+            <li class="text-mp-black font-medium">{{ accion }}</li>
+        </ol>
+    </nav>
+
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-mp-black">👥 {{ titulo }}</h1>
+        <a href="{% url 'admin_panel:users' %}" class="text-sm text-mp-red hover:underline">← Volver al listado</a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm">
+                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for field in form %}
+                <div class="{% if field.name == 'address' or field.name == 'password' %}md:col-span-2{% endif %}">
+                    {% if field.field.widget.input_type == 'checkbox' %}
+                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                        {{ field }}
+                        <span>{{ field.label }}</span>
+                    </label>
+                    {% else %}
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-mp-red">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% endif %}
+
+                    {% if field.help_text %}
+                    <p class="text-xs text-gray-400 mt-1">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                    <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="flex items-center space-x-3 mt-6">
+                <button type="submit" class="btn-primary">{{ accion }} usuario</button>
+                <a href="{% url 'admin_panel:users' %}" class="btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

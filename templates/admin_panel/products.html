@@ -1,0 +1,99 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Gestión de Productos{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <nav class="text-sm mb-4">
+        <ol class="flex items-center space-x-2 text-gray-500">
+            <li><a href="{% url 'admin_panel:dashboard' %}" class="hover:text-mp-red">Admin</a></li>
+            <li>/</li>
+            <li class="text-mp-black font-medium">Productos</li>
+        </ol>
+    </nav>
+
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        <div class="flex items-center gap-4">
+            <h1 class="text-2xl font-bold text-mp-black">🎸 Gestión de Productos</h1>
+            <a href="{% url 'admin_panel:product_create' %}" class="bg-mp-red hover:bg-mp-red-dark text-white text-sm font-semibold py-2 px-4 rounded-lg transition-all">+ Nuevo producto</a>
+        </div>
+        <form action="" method="GET" class="flex gap-2">
+            <select name="category" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-mp-red focus:outline-none">
+                <option value="">Todas las categorías</option>
+                {% for cat in categories %}
+                <option value="{{ cat.slug }}" {% if current_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="q" value="{{ query }}" placeholder="Buscar..."
+                class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-mp-red focus:outline-none w-48">
+            <button type="submit" class="px-4 py-2 bg-mp-black text-white rounded-lg text-sm">Buscar</button>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500">Producto</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500">SKU</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500">Categoría</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500">Marca</th>
+                        <th class="px-4 py-3 text-right text-xs font-semibold text-gray-500">Precio</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500">Stock</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500">Estado</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500">Flags</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-gray-500">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    {% for product in products %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <p class="font-semibold text-mp-black">{{ product.name|truncatewords:5 }}</p>
+                        </td>
+                        <td class="px-4 py-3 text-gray-500 font-mono text-xs">{{ product.sku }}</td>
+                        <td class="px-4 py-3 text-gray-600 text-xs">{{ product.category }}</td>
+                        <td class="px-4 py-3 text-gray-600 text-xs">{{ product.brand|default:"-" }}</td>
+                        <td class="px-4 py-3 text-right font-bold text-mp-red">${{ product.price|intcomma }}</td>
+                        <td class="px-4 py-3 text-center">
+                            <span class="font-semibold {% if product.stock == 0 %}text-red-600{% elif product.stock <= product.min_stock %}text-amber-600{% else %}text-green-600{% endif %}">
+                                {{ product.stock }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            {% if product.is_active %}
+                            <span class="badge bg-green-100 text-green-700 text-xs">Activo</span>
+                            {% else %}
+                            <span class="badge bg-red-100 text-red-700 text-xs">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="flex gap-1 justify-center">
+                                {% if product.is_featured %}<span class="badge bg-yellow-100 text-yellow-700 text-xs">★</span>{% endif %}
+                                {% if product.is_new %}<span class="badge bg-blue-100 text-blue-700 text-xs">Nuevo</span>{% endif %}
+                                {% if product.is_on_sale %}<span class="badge bg-red-100 text-red-700 text-xs">%</span>{% endif %}
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="flex items-center justify-center gap-3 text-xs">
+                                <a href="{% url 'admin_panel:product_edit' product.id %}" class="font-medium text-indigo-600 hover:text-indigo-800">Editar</a>
+                                <form method="POST" action="{% url 'admin_panel:product_toggle' product.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="font-medium {% if product.is_active %}text-red-600 hover:text-red-800{% else %}text-green-600 hover:text-green-800{% endif %}">
+                                        {% if product.is_active %}Desactivar{% else %}Activar{% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="9" class="px-4 py-8 text-center text-gray-400">No se encontraron productos</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

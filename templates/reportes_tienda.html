@@ -1,0 +1,649 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reportes · Tienda: Gestión Comercial | Music Pro</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    :root{
+        --rep-bg:#F5F7FB;
+        --rep-ink:#1F2937;
+        --rep-primary:#3B5BDB;
+        --rep-primary-soft:#E7EBFF;
+        --rep-accent:#12B886;
+        --rep-warn:#F59F00;
+        --rep-danger:#E8590C;
+    }
+    body{background:var(--rep-bg);color:var(--rep-ink);font-family:"Segoe UI",system-ui,-apple-system,sans-serif;}
+    a{text-decoration:none}
+
+    .rep-topbar{background:#1B2A4A;}
+    .rep-topbar .navbar-brand{color:#fff;font-weight:700;letter-spacing:.3px}
+    .rep-topbar .navbar-brand span{color:#8DA9FF}
+    .rep-topbar .nav-link{color:#C9D4F0;font-size:.92rem}
+    .rep-topbar .nav-link:hover{color:#fff}
+
+    .rep-hero{background:linear-gradient(135deg,#1B2A4A 0%,#2C3E75 55%,#3B5BDB 100%);color:#fff;padding:2.4rem 0 2rem}
+    .rep-hero h1{font-size:1.8rem;font-weight:800;margin:0}
+    .rep-hero p{color:#D6DEFA;margin:.4rem 0 0;font-size:.95rem}
+    .rep-hero .rep-date{font-size:.85rem;color:#AEBBF0}
+    .rep-kpi{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);border-radius:1rem;padding:.9rem 1.1rem}
+    .rep-kpi small{display:block;text-transform:uppercase;letter-spacing:.08em;font-size:.7rem;color:#C9D4F0}
+    .rep-kpi strong{display:block;font-size:1.45rem;line-height:1.2}
+
+    .rep-filters{background:#fff;border:1px solid #E6EAF3;border-radius:1rem;padding:1.1rem;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+    .rep-filters label{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:#6B7280;font-weight:700}
+    .rep-filters .form-control,.rep-filters .form-select{font-size:.88rem;border-color:#DDE3EE}
+    .rep-filters .form-control:focus,.rep-filters .form-select:focus{border-color:var(--rep-primary);box-shadow:0 0 0 .18rem rgba(59,91,219,.15)}
+
+    .rep-section-title{font-size:1.15rem;font-weight:800;margin:2.2rem 0 1rem;display:flex;align-items:center;gap:.6rem}
+    .rep-section-title i{width:8px;height:26px;border-radius:99px;background:var(--rep-primary);display:inline-block}
+    .rep-section-title.n2 i{background:var(--rep-accent)}
+    .rep-section-title.n3 i{background:var(--rep-warn)}
+    .rep-section-title.n4 i{background:var(--rep-danger)}
+    .rep-level{font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:.18rem .55rem;border-radius:99px}
+    .lvl-basic{background:#E7EBFF;color:#3B5BDB}
+    .lvl-inter{background:#DFF7EF;color:#0B7A5B}
+    .lvl-adv{background:#FFF3D6;color:#A15C00}
+    .lvl-an{background:#FFE9E0;color:#C2410C}
+
+    .rep-card{background:#fff;border:1px solid #E6EAF3;border-radius:1rem;height:100%;overflow:hidden;
+              box-shadow:0 1px 2px rgba(16,24,40,.05)}
+    .rep-card .rep-card-head{padding:.85rem 1.1rem;border-bottom:1px solid #EEF1F8;display:flex;gap:.7rem;align-items:flex-start}
+    .rep-num{flex:0 0 auto;width:34px;height:34px;border-radius:.6rem;background:var(--rep-primary-soft);color:var(--rep-primary);
+             font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+    .rep-num.n2{background:#DFF7EF;color:#0B7A5B}
+    .rep-num.n3{background:#FFF3D6;color:#A15C00}
+    .rep-num.n4{background:#FFE9E0;color:#C2410C}
+    .rep-card-head h3{font-size:.92rem;font-weight:700;margin:0}
+    .rep-card-head p{font-size:.75rem;color:#6B7280;margin:.2rem 0 0}
+    .rep-card-body{padding:1rem}
+    .rep-big{font-size:1.95rem;font-weight:800;line-height:1.1}
+    .rep-sub{font-size:.78rem;color:#6B7280}
+
+    .table{margin:0;font-size:.84rem}
+    .table thead th{background:#F7F8FC;border-bottom:1px solid #E6EAF3;text-transform:uppercase;font-size:.66rem;
+                    letter-spacing:.06em;color:#6B7280;padding:.5rem .7rem}
+    .table tbody td{padding:.5rem .7rem;vertical-align:middle;border-color:#F0F2F8}
+    .table-hover tbody tr:hover{background:#FAFBFF}
+    .table-max{max-height:340px;overflow-y:auto}
+    .rep-chip{display:inline-block;padding:.15rem .55rem;border-radius:99px;font-size:.7rem;font-weight:700}
+    .chip-blue{background:#E7EBFF;color:#3B5BDB}
+    .chip-green{background:#DFF7EF;color:#0B7A5B}
+    .chip-amber{background:#FFF3D6;color:#A15C00}
+    .chip-gray{background:#EEF1F8;color:#4B5563}
+    .chip-red{background:#FFE9E0;color:#C2410C}
+
+    .rep-footer{background:#1B2A4A;color:#AEBBF0;font-size:.83rem;padding:1.3rem 0;margin-top:2.4rem}
+    .rep-empty{color:#9CA3AF;font-size:.85rem;text-align:center;padding:.6rem 0}
+</style>
+</head>
+<body>
+
+<!-- Barra superior -->
+<nav class="navbar rep-topbar px-3 px-md-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'catalog:home' %}">&#9834; Music <span>Pro</span> · Reportes</a>
+        <div class="d-flex align-items-center gap-3">
+            <a class="nav-link d-none d-sm-inline" href="{% url 'admin_panel:dashboard' %}">Panel Admin</a>
+            <a class="nav-link d-none d-sm-inline" href="{% url 'admin_panel:products' %}">Productos</a>
+            <a class="nav-link d-none d-sm-inline" href="{% url 'admin_panel:users' %}">Usuarios</a>
+            <a class="btn btn-sm btn-outline-light" href="{% url 'accounts:logout' %}">Cerrar sesión</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Encabezado + KPIs -->
+<header class="rep-hero">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+            <div>
+                <h1>Tienda: Gestión Comercial, Clientes y Ventas</h1>
+                <p>20 consultas ORM · Categoria, Producto, Cliente, Venta y DetalleVenta · sin SQL crudo</p>
+            </div>
+            <div class="rep-date">Generado el {{ fecha_reporte|date:"d/m/Y H:i" }}</div>
+        </div>
+        <div class="row row-cols-2 row-cols-lg-4 g-3 mt-3">
+            <div class="col"><div class="rep-kpi"><small>Productos disponibles</small><strong>{{ q01_total|intcomma }}</strong></div></div>
+            <div class="col"><div class="rep-kpi"><small>Clientes registrados</small><strong>{{ q05_total_clientes|intcomma }}</strong></div></div>
+            <div class="col"><div class="rep-kpi"><small>Ventas del período</small><strong>{{ q08_total_ventas|intcomma }}</strong></div></div>
+            <div class="col"><div class="rep-kpi"><small>Promedio por venta</small><strong>${{ q15_promedio_venta|floatformat:0|intcomma }}</strong></div></div>
+        </div>
+    </div>
+</header>
+
+<main class="container pb-4">
+
+    <!-- Filtros (consultas con selección) -->
+    <form method="GET" class="rep-filters mt-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-6 col-md-3 col-xl-2">
+                <label for="categoria">2 · Categoría</label>
+                <select class="form-select" id="categoria" name="categoria">
+                    <option value="">— Selecciona —</option>
+                    {% for cat in categorias %}
+                    <option value="{{ cat.id }}" {% if filtros.categoria == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-xl-2">
+                <label for="precio_min">3 · Precio desde ($)</label>
+                <input class="form-control" type="number" min="0" id="precio_min" name="precio_min" value="{{ filtros.precio_min }}">
+            </div>
+            <div class="col-6 col-md-3 col-xl-2">
+                <label for="precio_max">3 · Precio hasta ($)</label>
+                <input class="form-control" type="number" min="0" id="precio_max" name="precio_max" value="{{ filtros.precio_max }}">
+            </div>
+            <div class="col-6 col-md-3 col-xl-2">
+                <label for="cliente">6 · Cliente</label>
+                <select class="form-select" id="cliente" name="cliente">
+                    <option value="">— Selecciona —</option>
+                    {% for c in clientes %}
+                    <option value="{{ c.id }}" {% if filtros.cliente == c.id %}selected{% endif %}>{{ c.get_full_name|default:c.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-xl-2">
+                <label for="venta">7 · Venta</label>
+                <select class="form-select" id="venta" name="venta">
+                    <option value="">— Selecciona —</option>
+                    {% for v in ventas %}
+                    <option value="{{ v.id }}" {% if filtros.venta == v.id %}selected{% endif %}>#{{ v.order_number }} · {{ v.user.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-6 col-md-3 col-xl-2">
+                <label for="dia">10 · Día seleccionado</label>
+                <input class="form-control" type="date" id="dia" name="dia" value="{{ filtros.dia }}">
+            </div>
+            <div class="col-6 col-md-3 col-xl-2">
+                <label for="desde">8 · Período desde</label>
+                <input class="form-control" type="date" id="desde" name="desde" value="{{ filtros.desde }}">
+            </div>
+            <div class="col-6 col-md-3 col-xl-2">
+                <label for="hasta">8 · Período hasta</label>
+                <input class="form-control" type="date" id="hasta" name="hasta" value="{{ filtros.hasta }}">
+            </div>
+            <div class="col-6 col-md-3 col-xl-2">
+                <label for="anio">18/19 · Año</label>
+                <input class="form-control" type="number" id="anio" name="anio" min="2000" max="2100" value="{{ filtros.anio }}">
+            </div>
+            <div class="col-6 col-md-3 col-xl-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary w-100">Aplicar</button>
+                <a href="{% url 'reportes:tienda' %}" class="btn btn-outline-secondary">Limpiar</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- ==================== NIVEL BÁSICO (1-5) ==================== -->
+    <h2 class="rep-section-title"><i></i>Nivel Básico <span class="rep-level lvl-basic">Consultas 1 – 5</span></h2>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+
+        <!-- 1 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num">01</span>
+                    <div><h3>¿Cuáles son todos los productos disponibles en la tienda?</h3>
+                        <p>Product.objects.filter(is_active=True)</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="px-3 pt-3"><span class="rep-big">{{ q01_total|intcomma }}</span> <span class="rep-sub">productos</span></div>
+                    <div class="table-responsive table-max mt-2">
+                        <table class="table table-hover">
+                            <thead><tr><th>Producto</th><th>Categoría</th><th class="text-end">Precio</th></tr></thead>
+                            <tbody>
+                            {% for p in q01_productos|slice:":20" %}
+                                <tr><td>{{ p.name|truncatewords:4 }}</td><td>{{ p.category }}</td>
+                                    <td class="text-end fw-semibold">${{ p.price|intcomma }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="3" class="rep-empty">Sin productos</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num">02</span>
+                    <div><h3>¿Qué productos pertenecen a una categoría seleccionada?</h3>
+                        <p>filter(is_active=True, category_id={{ filtros.categoria }})</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive table-max">
+                        <table class="table table-hover">
+                            <thead><tr><th>Producto</th><th>SKU</th><th class="text-end">Precio</th></tr></thead>
+                            <tbody>
+                            {% for p in q02_por_categoria|slice:":20" %}
+                                <tr><td>{{ p.name|truncatewords:4 }}</td><td class="font-monospace">{{ p.sku }}</td>
+                                    <td class="text-end fw-semibold">${{ p.price|intcomma }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="3" class="rep-empty">Sin productos en la categoría seleccionada</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num">03</span>
+                    <div><h3>¿Qué productos se encuentran dentro de un rango de precios?</h3>
+                        <p>filter(price__gte={{ filtros.precio_min }}, price__lte={{ filtros.precio_max }})</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive table-max">
+                        <table class="table table-hover">
+                            <thead><tr><th>Producto</th><th class="text-end">Precio</th></tr></thead>
+                            <tbody>
+                            {% for p in q03_rango_precios|slice:":20" %}
+                                <tr><td>{{ p.name|truncatewords:4 }}</td>
+                                    <td class="text-end fw-semibold">${{ p.price|intcomma }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="2" class="rep-empty">Sin productos en el rango</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num">04</span>
+                    <div><h3>¿Cuáles son los 10 productos más caros de la tienda?</h3>
+                        <p>order_by('-price')[:10]</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead><tr><th>#</th><th>Producto</th><th class="text-end">Precio</th></tr></thead>
+                            <tbody>
+                            {% for p in q04_top_precio %}
+                                <tr><td class="text-muted">{{ forloop.counter }}</td><td>{{ p.name|truncatewords:4 }}</td>
+                                    <td class="text-end fw-semibold">${{ p.price|intcomma }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="3" class="rep-empty">Sin productos</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num">05</span>
+                    <div><h3>¿Cuántos clientes están registrados en el sistema?</h3>
+                        <p>User.objects.filter(user_type='customer').count()</p></div></div>
+                <div class="rep-card-body">
+                    <div class="rep-big">{{ q05_total_clientes|intcomma }}</div>
+                    <div class="rep-sub">clientes registrados</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== NIVEL INTERMEDIO (6-12) ==================== -->
+    <h2 class="rep-section-title n2"><i></i>Nivel Intermedio <span class="rep-level lvl-inter">Consultas 6 – 12</span></h2>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+
+        <!-- 6 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n2">06</span>
+                    <div><h3>¿Cuáles son las compras realizadas por un cliente específico?</h3>
+                        <p>Order.objects.filter(user_id={{ filtros.cliente }})</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive table-max">
+                        <table class="table table-hover">
+                            <thead><tr><th>Venta</th><th>Fecha</th><th>Estado</th><th class="text-end">Total</th></tr></thead>
+                            <tbody>
+                            {% for o in q06_compras_cliente|slice:":20" %}
+                                <tr>
+                                    <td class="fw-semibold">#{{ o.order_number }}</td>
+                                    <td>{{ o.created_at|date:"d/m/Y" }}</td>
+                                    <td><span class="rep-chip {% if o.status == 'delivered' %}chip-green{% elif o.status == 'cancelled' %}chip-red{% elif o.status == 'pending' %}chip-amber{% else %}chip-blue{% endif %}">{{ o.get_status_display }}</span></td>
+                                    <td class="text-end fw-semibold">${{ o.total|intcomma }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="4" class="rep-empty">El cliente seleccionado no tiene compras</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n2">07</span>
+                    <div><h3>¿Qué productos adquirió un cliente en una venta determinada?</h3>
+                        <p>OrderItem.objects.filter(order_id={{ filtros.venta }})</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead><tr><th>Producto</th><th class="text-end">Cant.</th><th class="text-end">Subtotal</th></tr></thead>
+                            <tbody>
+                            {% for item in q07_productos_venta %}
+                                <tr><td>{{ item.product_name|truncatewords:4 }}</td>
+                                    <td class="text-end">{{ item.quantity }}</td>
+                                    <td class="text-end fw-semibold">${{ item.subtotal|intcomma }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="3" class="rep-empty">Sin productos en la venta seleccionada</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n2">08</span>
+                    <div><h3>¿Cuántas ventas se realizaron durante un período seleccionado?</h3>
+                        <p>filter(created_at__date__gte={{ filtros.desde }}, created_at__date__lte={{ filtros.hasta }})</p></div></div>
+                <div class="rep-card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div><div class="rep-big">{{ q08_total_ventas|intcomma }}</div>
+                            <div class="rep-sub">ventas entre {{ filtros.desde }} y {{ filtros.hasta }}</div></div>
+                        <div class="text-end"><div class="rep-big" style="font-size:1.4rem;color:var(--rep-accent)">${{ q08_monto_periodo|intcomma }}</div>
+                            <div class="rep-sub">monto total</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n2">09</span>
+                    <div><h3>¿Cuáles son los productos que tienen menos de cinco unidades disponibles?</h3>
+                        <p>filter(is_active=True, stock__lt=5)</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive table-max">
+                        <table class="table table-hover">
+                            <thead><tr><th>Producto</th><th class="text-end">Stock</th></tr></thead>
+                            <tbody>
+                            {% for p in q09_poco_stock|slice:":20" %}
+                                <tr><td>{{ p.name|truncatewords:4 }}</td>
+                                    <td class="text-end fw-semibold {% if p.stock == 0 %}text-danger{% else %}text-warning{% endif %}">{{ p.stock }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="2" class="rep-empty">Todos los productos tienen 5 o más unidades</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n2">10</span>
+                    <div><h3>¿Cuál es el monto total vendido durante un día seleccionado?</h3>
+                        <p>filter(created_at__date={{ filtros.dia }}).aggregate(Sum('total'))</p></div></div>
+                <div class="rep-card-body">
+                    <div class="rep-big" style="color:var(--rep-accent)">${{ q10_monto_dia|intcomma }}</div>
+                    <div class="rep-sub">{{ q10_ventas_dia }} ventas registradas el {{ filtros.dia }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 11 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n2">11</span>
+                    <div><h3>¿Cuáles son los cinco productos más vendidos según cantidad de unidades?</h3>
+                        <p>values('product__name').annotate(Sum('quantity'))[:5]</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead><tr><th>#</th><th>Producto</th><th class="text-end">Unidades</th></tr></thead>
+                            <tbody>
+                            {% for fila in q11_top_unidades %}
+                                <tr><td class="text-muted">{{ forloop.counter }}</td>
+                                    <td>{{ fila.product__name|truncatewords:4 }}</td>
+                                    <td class="text-end fw-semibold">{{ fila.unidades|intcomma }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="3" class="rep-empty">Sin ventas registradas</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 12 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n2">12</span>
+                    <div><h3>¿Cuáles son los cinco clientes que han realizado más compras?</h3>
+                        <p>annotate(compras=Count('orders'))[:5]</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead><tr><th>#</th><th>Cliente</th><th class="text-end">Compras</th></tr></thead>
+                            <tbody>
+                            {% for c in q12_top_compradores %}
+                                <tr><td class="text-muted">{{ forloop.counter }}</td>
+                                    <td>{{ c.get_full_name|default:c.username|truncatewords:3 }}</td>
+                                    <td class="text-end fw-semibold">{{ c.compras }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="3" class="rep-empty">Sin clientes</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== NIVEL AVANZADO (13-17) ==================== -->
+    <h2 class="rep-section-title n3"><i></i>Nivel Avanzado <span class="rep-level lvl-adv">Consultas 13 – 17</span></h2>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+
+        <!-- 13 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n3">13</span>
+                    <div><h3>¿Cuál es el monto total comprado por cada cliente?</h3>
+                        <p>annotate(total_comprado=Sum('orders__total'))</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive table-max">
+                        <table class="table table-hover">
+                            <thead><tr><th>Cliente</th><th class="text-end">Monto comprado</th></tr></thead>
+                            <tbody>
+                            {% for c in q13_monto_por_cliente|slice:":20" %}
+                                <tr><td>{{ c.get_full_name|default:c.username|truncatewords:3 }}</td>
+                                    <td class="text-end fw-semibold">${{ c.total_comprado|default:0|intcomma }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="2" class="rep-empty">Sin clientes</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 14 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n3">14</span>
+                    <div><h3>¿Qué productos nunca han sido vendidos?</h3>
+                        <p>Product.objects.filter(orderitem__isnull=True)</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive table-max">
+                        <table class="table table-hover">
+                            <thead><tr><th>Producto</th><th>Categoría</th></tr></thead>
+                            <tbody>
+                            {% for p in q14_nunca_vendidos|slice:":20" %}
+                                <tr><td>{{ p.name|truncatewords:4 }}</td><td>{{ p.category }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="2" class="rep-empty">Todos los productos han sido vendidos</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 15 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n3">15</span>
+                    <div><h3>¿Cuál es el promedio de dinero gastado por venta?</h3>
+                        <p>exclude(status='cancelled').aggregate(Avg('total'))</p></div></div>
+                <div class="rep-card-body">
+                    <div class="rep-big">${{ q15_promedio_venta|floatformat:2|intcomma }}</div>
+                    <div class="rep-sub">promedio por venta (sin canceladas)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 16 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n3">16</span>
+                    <div><h3>¿Qué categoría genera el mayor monto de ventas?</h3>
+                        <p>values('product__category__name').annotate(Sum(F('quantity')*F('product_price')))[:1]</p></div></div>
+                <div class="rep-card-body">
+                    {% with top=q16_categoria_top|first %}
+                        {% if top %}
+                        <div class="rep-big txt" style="color:var(--rep-warn)">{{ top.product__category__name }}</div>
+                        <div class="rep-sub">${{ top.monto|intcomma }} en ventas</div>
+                        {% else %}
+                        <div class="rep-empty">Sin ventas registradas</div>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 17 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n3">17</span>
+                    <div><h3>¿Cuántas unidades se han vendido de cada producto durante el último mes?</h3>
+                        <p>filter(order__created_at en {{ q17_rango.desde|date:"d/m/Y" }} – {{ q17_rango.hasta|date:"d/m/Y" }}).annotate(Sum('quantity'))</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive table-max">
+                        <table class="table table-hover">
+                            <thead><tr><th>Producto</th><th class="text-end">Unidades</th></tr></thead>
+                            <tbody>
+                            {% for fila in q17_unidades_mes|slice:":20" %}
+                                <tr><td>{{ fila.product__name|truncatewords:4 }}</td>
+                                    <td class="text-end fw-semibold">{{ fila.unidades|intcomma }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="2" class="rep-empty">Sin ventas en el último mes</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== NIVEL ANÁLISIS (18-20) ==================== -->
+    <h2 class="rep-section-title n4"><i></i>Nivel Análisis <span class="rep-level lvl-an">Consultas 18 – 20</span></h2>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+
+        <!-- 18 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n4">18</span>
+                    <div><h3>¿Qué cliente ha gastado más dinero durante el año?</h3>
+                        <p>filter(orders__created_at__year={{ filtros.anio }}).annotate(Sum('orders__total')).first()</p></div></div>
+                <div class="rep-card-body">
+                    {% if q18_cliente_anio %}
+                    <div class="rep-big txt">{{ q18_cliente_anio.get_full_name|default:q18_cliente_anio.username }}</div>
+                    <div class="rep-sub">${{ q18_cliente_anio.gasto|intcomma }} gastados en {{ filtros.anio }}</div>
+                    {% else %}
+                    <div class="rep-empty">Sin compras registradas en {{ filtros.anio }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 19 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n4">19</span>
+                    <div><h3>¿Cómo se distribuyen los montos de ventas por mes durante el año seleccionado?</h3>
+                        <p>annotate(mes=TruncMonth('created_at')).values('mes').annotate(Sum('total')) · {{ filtros.anio }}</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive table-max">
+                        <table class="table table-hover">
+                            <thead><tr><th>Mes</th><th class="text-end">Ventas</th><th class="text-end">Monto</th></tr></thead>
+                            <tbody>
+                            {% for fila in q19_montos_por_mes %}
+                                <tr><td>{{ fila.mes|date:"m/Y" }}</td>
+                                    <td class="text-end">{{ fila.ventas|intcomma }}</td>
+                                    <td class="text-end fw-semibold">${{ fila.monto|intcomma }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="3" class="rep-empty">Sin ventas en {{ filtros.anio }}</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 20 -->
+        <div class="col">
+            <div class="rep-card">
+                <div class="rep-card-head"><span class="rep-num n4">20</span>
+                    <div><h3>¿Cuáles son los 10 productos que generan mayores ingresos para la tienda?</h3>
+                        <p>values('product__name').annotate(Sum(F('quantity')*F('product_price')))[:10]</p></div></div>
+                <div class="rep-card-body p-0">
+                    <div class="table-responsive table-max">
+                        <table class="table table-hover">
+                            <thead><tr><th>#</th><th>Producto</th><th class="text-end">Ingresos</th></tr></thead>
+                            <tbody>
+                            {% for fila in q20_top_ingresos %}
+                                <tr><td class="text-muted">{{ forloop.counter }}</td>
+                                    <td>{{ fila.product__name|truncatewords:4 }}</td>
+                                    <td class="text-end fw-semibold">${{ fila.ingresos|intcomma }}</td></tr>
+                            {% empty %}
+                                <tr><td colspan="3" class="rep-empty">Sin ventas registradas</td></tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p class="rep-sub mt-4 mb-0">Las 20 consultas se resuelven con ORM de Django (filter · values · annotate · aggregate · Sum · Count · Avg · F · TruncMonth) y <strong>no utilizan SQL crudo</strong>.</p>
+</main>
+
+<footer class="rep-footer">
+    <div class="container d-flex flex-column flex-sm-row justify-content-between gap-2">
+        <span>&copy; 2026 Music Pro S.A. · Reportes de Gestión Comercial</span>
+        <a href="{% url 'admin_panel:dashboard' %}" class="text-white text-decoration-underline">Volver al panel de administración</a>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

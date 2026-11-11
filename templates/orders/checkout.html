@@ -1,0 +1,176 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-mp-black mb-8">💳 Checkout</h1>
+
+    <form method="POST" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {% csrf_token %}
+        <!-- Shipping Info -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Shipping Method -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-mp-black mb-4">📦 Método de Despacho</h2>
+                <div class="space-y-3">
+                    <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:border-mp-red transition-colors has-[:checked]:border-mp-red has-[:checked]:bg-red-50">
+                        <input type="radio" name="shipping_method" value="home" checked class="w-5 h-5 text-mp-red focus:ring-mp-red">
+                        <div class="ml-4 flex-1">
+                            <div class="flex justify-between">
+                                <span class="font-semibold">Despacho a Domicilio</span>
+                                <span class="font-bold text-mp-red">{% if shipping > 0 %}${{ shipping|intcomma }}{% else %}Gratis{% endif %}</span>
+                            </div>
+                            <p class="text-sm text-gray-500">2-5 días hábiles</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:border-mp-red transition-colors has-[:checked]:border-mp-red has-[:checked]:bg-red-50">
+                        <input type="radio" name="shipping_method" value="express" class="w-5 h-5 text-mp-red focus:ring-mp-red">
+                        <div class="ml-4 flex-1">
+                            <div class="flex justify-between">
+                                <span class="font-semibold">Despacho Express (24h)</span>
+                                <span class="font-bold text-mp-red">$12.990</span>
+                            </div>
+                            <p class="text-sm text-gray-500">Entrega en menos de 24 horas</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:border-mp-red transition-colors has-[:checked]:border-mp-red has-[:checked]:bg-red-50">
+                        <input type="radio" name="shipping_method" value="pickup" class="w-5 h-5 text-mp-red focus:ring-mp-red">
+                        <div class="ml-4 flex-1">
+                            <div class="flex justify-between">
+                                <span class="font-semibold">Retiro en Tienda</span>
+                                <span class="font-bold text-green-600">Gratis</span>
+                            </div>
+                            <p class="text-sm text-gray-500">Retira en Sucursal Providencia</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-mp-black mb-4">📍 Dirección de Despacho</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                        <input type="text" name="shipping_name" value="{{ user.get_full_name }}" required class="form-input">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                        <input type="text" name="shipping_address" value="{{ user.address }}" required class="form-input" placeholder="Calle, número, depto">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
+                        <input type="text" name="shipping_city" value="{{ user.city|default:'Santiago' }}" required class="form-input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Región</label>
+                        <input type="text" name="shipping_region" value="{{ user.region|default:'Metropolitana' }}" required class="form-input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Código Postal</label>
+                        <input type="text" name="shipping_postal_code" value="{{ user.postal_code }}" class="form-input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                        <input type="text" name="shipping_phone" value="{{ user.phone }}" required class="form-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-mp-black mb-4">💳 Método de Pago</h2>
+                <div class="space-y-3">
+                    <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:border-mp-red transition-colors has-[:checked]:border-mp-red has-[:checked]:bg-red-50">
+                        <input type="radio" name="payment_method" value="credit_card" checked class="w-5 h-5 text-mp-red focus:ring-mp-red">
+                        <div class="ml-4">
+                            <span class="font-semibold">Tarjeta de Crédito</span>
+                            <p class="text-sm text-gray-500">Visa, Mastercard, Amex</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:border-mp-red transition-colors has-[:checked]:border-mp-red has-[:checked]:bg-red-50">
+                        <input type="radio" name="payment_method" value="debit_card" class="w-5 h-5 text-mp-red focus:ring-mp-red">
+                        <div class="ml-4">
+                            <span class="font-semibold">Tarjeta de Débito</span>
+                            <p class="text-sm text-gray-500">Redcompra, Visa Débito</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:border-mp-red transition-colors has-[:checked]:border-mp-red has-[:checked]:bg-red-50">
+                        <input type="radio" name="payment_method" value="webpay" class="w-5 h-5 text-mp-red focus:ring-mp-red">
+                        <div class="ml-4">
+                            <span class="font-semibold">Webpay</span>
+                            <p class="text-sm text-gray-500">Pago seguro Transbank</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:border-mp-red transition-colors has-[:checked]:border-mp-red has-[:checked]:bg-red-50">
+                        <input type="radio" name="payment_method" value="transfer" class="w-5 h-5 text-mp-red focus:ring-mp-red">
+                        <div class="ml-4">
+                            <span class="font-semibold">Transferencia Bancaria</span>
+                            <p class="text-sm text-gray-500">Transferencia directa</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:border-mp-red transition-colors has-[:checked]:border-mp-red has-[:checked]:bg-red-50">
+                        <input type="radio" name="payment_method" value="mercadopago" class="w-5 h-5 text-mp-red focus:ring-mp-red">
+                        <div class="ml-4">
+                            <span class="font-semibold">Mercado Pago</span>
+                            <p class="text-sm text-gray-500">Pago con Mercado Pago</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-mp-black mb-4">📝 Notas del Pedido</h2>
+                <textarea name="notes" rows="3" class="form-input" placeholder="Instrucciones especiales de entrega (opcional)"></textarea>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24">
+                <h2 class="text-xl font-bold text-mp-black mb-6">Resumen</h2>
+                
+                <div class="space-y-3 mb-4">
+                    {% for item in items %}
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600 truncate flex-1 mr-2">{{ item.product.name|truncatewords:5 }} × {{ item.quantity }}</span>
+                        <span class="font-medium whitespace-nowrap">${{ item.subtotal|intcomma }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Subtotal</span>
+                        <span>${{ subtotal|intcomma }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">Despacho</span>
+                        <span>{% if shipping == 0 %}Gratis{% else %}${{ shipping|intcomma }}{% endif %}</span>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="flex justify-between mb-6">
+                    <span class="text-lg font-bold">Total</span>
+                    <span class="text-lg font-bold text-mp-red">${{ grand_total|intcomma }}</span>
+                </div>
+                
+                <button type="submit" class="btn-primary w-full text-center">
+                    🔒 Confirmar y Pagar
+                </button>
+                
+                <p class="text-center text-xs text-gray-500 mt-4">
+                    Pago seguro con encriptación SSL de 256 bits
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

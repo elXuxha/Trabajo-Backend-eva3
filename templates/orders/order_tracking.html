@@ -1,0 +1,52 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Seguimiento {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-2xl font-bold text-mp-black mb-2">📍 Seguimiento del Pedido</h1>
+    <p class="text-gray-500 mb-8">Pedido #{{ order.order_number }}</p>
+
+    <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-8">
+        <div class="relative">
+            {% for status_code, status_name, status_desc in status_steps %}
+            <div class="flex items-start mb-8 last:mb-0">
+                <div class="flex-shrink-0 relative">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center {% if forloop.counter0 <= current_index %}bg-mp-red text-white{% else %}bg-gray-200 text-gray-500{% endif %} font-bold text-sm">
+                        {% if forloop.counter0 <= current_index %}✓{% else %}{{ forloop.counter }}{% endif %}
+                    </div>
+                    {% if not forloop.last %}
+                    <div class="absolute top-10 left-1/2 -translate-x-1/2 w-0.5 h-8 {% if forloop.counter0 < current_index %}bg-mp-red{% else %}bg-gray-200{% endif %}"></div>
+                    {% endif %}
+                </div>
+                <div class="ml-4">
+                    <h3 class="font-semibold {% if forloop.counter0 <= current_index %}text-mp-black{% else %}text-gray-400{% endif %}">
+                        {{ status_name }}
+                    </h3>
+                    <p class="text-sm {% if forloop.counter0 <= current_index %}text-gray-600{% else %}text-gray-400{% endif %}">
+                        {{ status_desc }}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if order.tracking_number %}
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h2 class="font-bold text-mp-black mb-2">📦 Número de Rastreo</h2>
+        <p class="text-lg text-mp-red font-mono">{{ order.tracking_number }}</p>
+    </div>
+    {% endif %}
+
+    <div class="flex gap-4">
+        <a href="{% url 'orders:order_detail' order.order_number %}" class="btn-primary">
+            Ver Detalle del Pedido
+        </a>
+        <a href="{% url 'accounts:order_history' %}" class="btn-secondary">
+            Mis Pedidos
+        </a>
+    </div>
+</div>
+{% endblock %}

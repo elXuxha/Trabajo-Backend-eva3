@@ -1,0 +1,166 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Panel de Bodega{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-mp-black">📦 Panel de Bodega</h1>
+            <p class="text-gray-500 mt-1">Bienvenido, {{ user.get_full_name }}</p>
+        </div>
+        <span class="badge bg-amber-100 text-amber-800 text-sm px-4 py-2">Colaborador</span>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <a href="{% url 'warehouse:stock_list' %}" class="card p-6 hover:ring-2 hover:ring-mp-red transition-all">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Total Productos</p>
+                    <p class="text-3xl font-bold text-mp-black">{{ total_products }}</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span class="text-2xl">🎸</span>
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'warehouse:stock_list' %}?filter=low" class="card p-6 hover:ring-2 hover:ring-amber-400 transition-all">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Stock Bajo</p>
+                    <p class="text-3xl font-bold text-amber-600">{{ low_stock_count }}</p>
+                </div>
+                <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                    <span class="text-2xl">⚠️</span>
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'warehouse:stock_list' %}?filter=out" class="card p-6 hover:ring-2 hover:ring-red-400 transition-all">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Sin Stock</p>
+                    <p class="text-3xl font-bold text-red-600">{{ out_of_stock }}</p>
+                </div>
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <span class="text-2xl">❌</span>
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'warehouse:orders' %}" class="card p-6 hover:ring-2 hover:ring-green-400 transition-all">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500">Pedidos Pendientes</p>
+                    <p class="text-3xl font-bold text-green-600">{{ pending_count }}</p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <span class="text-2xl">📋</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Low Stock Alerts -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="px-6 py-4 border-b bg-amber-50">
+                <h2 class="text-lg font-bold text-amber-800">⚠️ Alertas de Stock Bajo</h2>
+            </div>
+            <div class="divide-y max-h-96 overflow-y-auto">
+                {% for product in low_stock_products %}
+                <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+                    <div class="flex-1">
+                        <p class="font-semibold text-mp-black text-sm">{{ product.name }}</p>
+                        <p class="text-xs text-gray-500">SKU: {{ product.sku }} | {{ product.category }}</p>
+                    </div>
+                    <div class="text-right ml-4">
+                        {% if product.stock == 0 %}
+                        <span class="badge bg-red-100 text-red-700">Sin Stock</span>
+                        {% else %}
+                        <span class="badge bg-amber-100 text-amber-700">{{ product.stock }} / {{ product.min_stock }} mín</span>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'warehouse:stock_edit' product.id %}" class="ml-4 text-mp-red hover:text-mp-red-dark text-sm font-medium">Editar</a>
+                </div>
+                {% empty %}
+                <div class="px-6 py-8 text-center text-gray-400">
+                    <span class="text-3xl block mb-2">✅</span>
+                    Todos los productos tienen stock suficiente
+                </div>
+                {% endfor %}
+            </div>
+            {% if low_stock_products %}
+            <div class="px-6 py-3 border-t bg-gray-50">
+                <a href="{% url 'warehouse:stock_list' %}?filter=low" class="text-sm text-mp-red hover:underline font-medium">Ver todos →</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Pending Orders -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="px-6 py-4 border-b bg-green-50">
+                <h2 class="text-lg font-bold text-green-800">📋 Pedidos por Preparar</h2>
+            </div>
+            <div class="divide-y max-h-96 overflow-y-auto">
+                {% for order in pending_orders %}
+                <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+                    <div class="flex-1">
+                        <p class="font-semibold text-mp-black text-sm">#{{ order.order_number }}</p>
+                        <p class="text-xs text-gray-500">{{ order.user.get_full_name }} | {{ order.get_shipping_method_display }}</p>
+                    </div>
+                    <div class="text-right ml-4">
+                        <span class="badge {% if order.status == 'pending' %}bg-yellow-100 text-yellow-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                        <p class="text-xs text-gray-500 mt-1">{{ order.total|intcomma }}</p>
+                    </div>
+                    <a href="{% url 'warehouse:order_detail' order.order_number %}" class="ml-4 text-mp-red hover:text-mp-red-dark text-sm font-medium">Ver</a>
+                </div>
+                {% empty %}
+                <div class="px-6 py-8 text-center text-gray-400">
+                    <span class="text-3xl block mb-2">✨</span>
+                    No hay pedidos pendientes
+                </div>
+                {% endfor %}
+            </div>
+            {% if pending_orders %}
+            <div class="px-6 py-3 border-t bg-gray-50">
+                <a href="{% url 'warehouse:orders' %}" class="text-sm text-mp-red hover:underline font-medium">Ver todos →</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Processing Orders -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden lg:col-span-2">
+            <div class="px-6 py-4 border-b bg-blue-50">
+                <h2 class="text-lg font-bold text-blue-800">📦 Pedidos en Preparación</h2>
+            </div>
+            <div class="divide-y max-h-64 overflow-y-auto">
+                {% for order in processing_orders %}
+                <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+                    <div class="flex-1">
+                        <p class="font-semibold text-mp-black text-sm">#{{ order.order_number }}</p>
+                        <p class="text-xs text-gray-500">{{ order.user.get_full_name }} | {{ order.get_shipping_method_display }} | {{ order.items.count }} items</p>
+                    </div>
+                    <div class="text-right ml-4">
+                        <p class="text-sm font-bold text-mp-red">${{ order.total|intcomma }}</p>
+                        <p class="text-xs text-gray-500">{{ order.created_at|date:"d/m H:i" }}</p>
+                    </div>
+                    <a href="{% url 'warehouse:order_detail' order.order_number %}" class="ml-4 text-mp-red hover:text-mp-red-dark text-sm font-medium">Ver</a>
+                </div>
+                {% empty %}
+                <div class="px-6 py-8 text-center text-gray-400">
+                    <span class="text-3xl block mb-2">📭</span>
+                    No hay pedidos en preparación
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Productos{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav class="text-sm mb-6">
+        <ol class="flex items-center space-x-2 text-gray-500">
+            <li><a href="{% url 'catalog:home' %}" class="hover:text-mp-red">Inicio</a></li>
+            <li>/</li>
+            <li class="text-mp-black font-medium">Productos</li>
+        </ol>
+    </nav>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Sidebar Filters -->
+        <aside class="w-full lg:w-64 flex-shrink-0">
+            <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24">
+                <h3 class="font-bold text-lg text-mp-black mb-4">Filtros</h3>
+                
+                <!-- Search -->
+                <form action="" method="GET" class="mb-6">
+                    <input type="hidden" name="sort" value="{{ current_sort }}">
+                    <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Buscar..."
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-mp-red focus:outline-none">
+                </form>
+                
+                <!-- Categories -->
+                <div class="mb-6">
+                    <h4 class="font-semibold text-sm text-gray-700 mb-3">Categorías</h4>
+                    <ul class="space-y-2">
+                        {% for cat in categories %}
+                        <li>
+                            <a href="?category={{ cat.slug }}&sort={{ current_sort }}" 
+                               class="flex items-center text-sm text-gray-600 hover:text-mp-red transition-colors {% if request.GET.category == cat.slug %}text-mp-red font-semibold{% endif %}">
+                                <span class="mr-2">♪</span>
+                                {{ cat.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <!-- Brands -->
+                <div class="mb-6">
+                    <h4 class="font-semibold text-sm text-gray-700 mb-3">Marcas</h4>
+                    <ul class="space-y-2">
+                        {% for brand in brands %}
+                        <li>
+                            <a href="?brand={{ brand.slug }}&sort={{ current_sort }}" 
+                               class="flex items-center text-sm text-gray-600 hover:text-mp-red transition-colors">
+                                {{ brand.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <a href="{% url 'catalog:product_list' %}" class="block text-center text-sm text-mp-red hover:underline mt-4">
+                    Limpiar Filtros
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-mp-black">
+                        {% if query %}Resultados para "{{ query }}"{% else %}Todos los Productos{% endif %}
+                    </h1>
+                    <p class="text-gray-500 text-sm mt-1">{{ products|length }} productos encontrados</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <label class="text-sm text-gray-600">Ordenar:</label>
+                    <select onchange="window.location.href='?sort='+this.value+'{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}'"
+                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-mp-red focus:outline-none">
+                        <option value="-created_at" {% if current_sort == '-created_at' %}selected{% endif %}>Más Recientes</option>
+                        <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Precio: Menor a Mayor</option>
+                        <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Precio: Mayor a Menor</option>
+                        <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Nombre A-Z</option>
+                        <option value="popular" {% if current_sort == 'popular' %}selected{% endif %}>Más Popular</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            {% if products %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {% for product in products %}
+                <a href="{{ product.get_absolute_url }}" class="card group">
+                    <div class="relative bg-gray-100 h-52 flex items-center justify-center overflow-hidden">
+                        {% if product.is_on_sale %}
+                        <span class="absolute top-3 left-3 badge bg-mp-red text-white">-{{ product.discount_percentage }}%</span>
+                        {% endif %}
+                        {% if product.is_new %}
+                        <span class="absolute top-3 right-3 badge bg-green-500 text-white">Nuevo</span>
+                        {% endif %}
+                        {% if product.images.first %}
+                        <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        {% else %}
+                        <span class="text-6xl group-hover:scale-110 transition-transform duration-300">🎵</span>
+                        {% endif %}
+                    </div>
+                    <div class="p-4">
+                        <p class="text-xs text-gray-500 mb-1">{{ product.brand|default:"Music Pro" }} | {{ product.category }}</p>
+                        <h3 class="font-semibold text-mp-black group-hover:text-mp-red transition-colors line-clamp-2 text-sm">{{ product.name }}</h3>
+                        <div class="flex items-center mt-2">
+                            <span class="text-lg font-bold text-mp-red">${{ product.price|intcomma }}</span>
+                            {% if product.original_price %}
+                            <span class="text-sm text-gray-400 line-through ml-2">${{ product.original_price|intcomma }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-xs {% if product.is_in_stock %}text-green-600{% else %}text-red-600{% endif %}">
+                                {% if product.is_in_stock %}✓ En stock ({{ product.stock }}){% else %}✗ Agotado{% endif %}
+                            </span>
+                            <span class="text-xs text-gray-400">SKU: {{ product.sku }}</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-16">
+                <span class="text-6xl mb-4 block">🔍</span>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">No se encontraron productos</h3>
+                <p class="text-gray-500 mb-6">Intenta con otros filtros o términos de búsqueda</p>
+                <a href="{% url 'catalog:product_list' %}" class="btn-primary">Ver Todos los Productos</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

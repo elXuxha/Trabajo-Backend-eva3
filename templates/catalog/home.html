@@ -1,0 +1,217 @@
+{% extends 'base/base.html' %}
+{% load humanize %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<section class="relative bg-gradient-to-r from-mp-black via-gray-900 to-mp-red overflow-hidden">
+    <div class="absolute inset-0 bg-black opacity-50"></div>
+    <div class="absolute inset-0">
+        <div class="absolute inset-0 bg-gradient-to-r from-mp-red/20 to-transparent"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+        <div class="text-center">
+            <span class="badge bg-mp-red text-white mb-4 text-sm">🎸 Music Pro Tour 2026</span>
+            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight">
+                La Gira de los <span class="text-mp-red">Mejores Instrumentos</span>
+            </h1>
+            <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Descubre nuestra colección premium de instrumentos musicales y equipos de audio profesional. 
+                Más de 35 años de experiencia al servicio de los músicos.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="{% url 'catalog:product_list' %}" class="btn-primary text-lg px-8 py-4">
+                    Ver Catálogo Completo
+                </a>
+                <a href="#featured" class="border-2 border-white text-white hover:bg-white hover:text-mp-black font-semibold py-4 px-8 rounded-lg transition-all duration-200">
+                    Productos Destacados
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Strip -->
+<section class="bg-white py-8 border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-center space-x-4 md:space-x-8 overflow-x-auto pb-2 scrollbar-hide">
+            {% for category in categories %}
+            <a href="{{ category.get_absolute_url }}" class="flex-shrink-0 flex flex-col items-center group">
+                <div class="w-16 h-16 rounded-full bg-gray-100 group-hover:bg-mp-red flex items-center justify-center transition-all duration-200">
+                    <span class="text-2xl group-hover:text-white transition-colors">🎵</span>
+                </div>
+                <span class="mt-2 text-sm font-medium text-gray-700 group-hover:text-mp-red transition-colors whitespace-nowrap">{{ category.name }}</span>
+            </a>
+            {% endfor %}
+            <a href="{% url 'catalog:product_list' %}" class="flex-shrink-0 flex flex-col items-center group">
+                <div class="w-16 h-16 rounded-full bg-mp-red flex items-center justify-center">
+                    <span class="text-2xl text-white">→</span>
+                </div>
+                <span class="mt-2 text-sm font-bold text-mp-red whitespace-nowrap">Ver Todo</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+{% if featured_products %}
+<section id="featured" class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-mp-black">Productos Destacados</h2>
+                <p class="text-gray-500 mt-1">Los favoritos de nuestros clientes</p>
+            </div>
+            <a href="{% url 'catalog:product_list' %}" class="text-mp-red hover:text-mp-red-dark font-semibold flex items-center">
+                Ver todos
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for product in featured_products %}
+            <a href="{{ product.get_absolute_url }}" class="card group">
+                <div class="relative bg-gray-100 h-56 flex items-center justify-center overflow-hidden">
+                    {% if product.is_on_sale %}
+                    <span class="absolute top-3 left-3 badge bg-mp-red text-white">-{{ product.discount_percentage }}%</span>
+                    {% endif %}
+                    {% if product.is_new %}
+                    <span class="absolute top-3 right-3 badge bg-green-500 text-white">Nuevo</span>
+                    {% endif %}
+                    <span class="text-6xl group-hover:scale-110 transition-transform duration-300">🎸</span>
+                </div>
+                <div class="p-4">
+                    <p class="text-sm text-gray-500 mb-1">{{ product.brand|default:"Music Pro" }}</p>
+                    <h3 class="font-semibold text-mp-black group-hover:text-mp-red transition-colors line-clamp-2">{{ product.name }}</h3>
+                    <div class="flex items-center mt-2">
+                        <span class="text-xl font-bold text-mp-red">${{ product.price|intcomma }}</span>
+                        {% if product.original_price %}
+                        <span class="text-sm text-gray-400 line-through ml-2">${{ product.original_price|intcomma }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="flex items-center mt-2">
+                        <span class="text-sm {% if product.is_in_stock %}text-green-600{% else %}text-red-600{% endif %}">
+                            {% if product.is_in_stock %}✓ En stock{% else %}✗ Agotado{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- New Arrivals -->
+{% if new_products %}
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-mp-black">Nuevos Ingresos</h2>
+                <p class="text-gray-500 mt-1">Lo último en instrumentos y equipamiento</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for product in new_products %}
+            <a href="{{ product.get_absolute_url }}" class="card group">
+                <div class="relative bg-gray-100 h-56 flex items-center justify-center overflow-hidden">
+                    <span class="absolute top-3 right-3 badge bg-green-500 text-white">Nuevo</span>
+                    <span class="text-6xl group-hover:scale-110 transition-transform duration-300">🎹</span>
+                </div>
+                <div class="p-4">
+                    <p class="text-sm text-gray-500 mb-1">{{ product.brand|default:"Music Pro" }}</p>
+                    <h3 class="font-semibold text-mp-black group-hover:text-mp-red transition-colors line-clamp-2">{{ product.name }}</h3>
+                    <div class="flex items-center mt-2">
+                        <span class="text-xl font-bold text-mp-red">${{ product.price|intcomma }}</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Sale Products -->
+{% if sale_products %}
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-mp-red">Ofertas Especiales</h2>
+                <p class="text-gray-500 mt-1">Aprovecha nuestros descuentos por la gira</p>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for product in sale_products %}
+            <a href="{{ product.get_absolute_url }}" class="card group">
+                <div class="relative bg-gray-100 h-56 flex items-center justify-center overflow-hidden">
+                    <span class="absolute top-3 left-3 badge bg-mp-red text-white">-{{ product.discount_percentage }}%</span>
+                    <span class="text-6xl group-hover:scale-110 transition-transform duration-300">🎵</span>
+                </div>
+                <div class="p-4">
+                    <p class="text-sm text-gray-500 mb-1">{{ product.brand|default:"Music Pro" }}</p>
+                    <h3 class="font-semibold text-mp-black group-hover:text-mp-red transition-colors line-clamp-2">{{ product.name }}</h3>
+                    <div class="flex items-center mt-2">
+                        <span class="text-xl font-bold text-mp-red">${{ product.price|intcomma }}</span>
+                        {% if product.original_price %}
+                        <span class="text-sm text-gray-400 line-through ml-2">${{ product.original_price|intcomma }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Benefits -->
+<section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+            <div class="p-6">
+                <div class="w-16 h-16 bg-mp-red/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-3xl">🚚</span>
+                </div>
+                <h3 class="font-semibold text-mp-black mb-2">Envío Express</h3>
+                <p class="text-gray-500 text-sm">Despacho en menos de 24 horas en Santiago</p>
+            </div>
+            <div class="p-6">
+                <div class="w-16 h-16 bg-mp-red/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-3xl">🔒</span>
+                </div>
+                <h3 class="font-semibold text-mp-black mb-2">Pago Seguro</h3>
+                <p class="text-gray-500 text-sm">Transacciones 100% seguras y encriptadas</p>
+            </div>
+            <div class="p-6">
+                <div class="w-16 h-16 bg-mp-red/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-3xl">🔄</span>
+                </div>
+                <h3 class="font-semibold text-mp-black mb-2">Devolución Fácil</h3>
+                <p class="text-gray-500 text-sm">30 días para devoluciones sin preguntas</p>
+            </div>
+            <div class="p-6">
+                <div class="w-16 h-16 bg-mp-red/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-3xl">⭐</span>
+                </div>
+                <h3 class="font-semibold text-mp-black mb-2">Garantía Premium</h3>
+                <p class="text-gray-500 text-sm">Garantía extendida en todos los productos</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter -->
+<section class="py-16 bg-gradient-to-r from-mp-black to-mp-gray">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold text-white mb-4">🎵 Suscríbete al Newsletter</h2>
+        <p class="text-gray-400 mb-8">Recibe ofertas exclusivas y novedades de la Music Pro Tour 2026</p>
+        <form class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+            <input type="email" placeholder="Tu correo electrónico" class="flex-1 px-4 py-3 rounded-lg focus:ring-2 focus:ring-mp-red outline-none">
+            <button type="submit" class="btn-primary whitespace-nowrap">Suscribirse</button>
+        </form>
+    </div>
+</section>
+{% endblock %}
